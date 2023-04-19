@@ -1,6 +1,7 @@
+from django.db.models import Sum
 from django.shortcuts import render
-from rest_framework import viewsets, generics, status
-from rest_framework.decorators import api_view
+from rest_framework import viewsets, generics, status, serializers
+from rest_framework.decorators import api_view, action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -30,3 +31,8 @@ class ModelCarGenerationViewSet(viewsets.ModelViewSet):
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+
+    @action(detail=False, methods=["get"], url_path=r'SumCars')
+    def get_sum_all_cars(self, request):
+        sum = self.queryset.aggregate(Sum('price_rubles'))
+        return Response(sum, status=status.HTTP_200_OK)
